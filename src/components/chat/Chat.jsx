@@ -46,13 +46,13 @@ export default function Chat() {
 
   useEffect(() => {
     webSocket.current.onmessage = (event) => {
-      const chatMessageDto = JSON.parse(event.data);
+      const chatMessageDto = event.data;
       console.log("Message:", chatMessageDto);
       setChatMessages([
         ...chatMessages,
         {
-          user: chatMessageDto.user,
-          message: chatMessageDto.message,
+          user: "Hayley_v2",
+          message: chatMessageDto,
         },
       ]);
       if (scrollBottomRef.current) {
@@ -79,6 +79,15 @@ export default function Chat() {
     if (user && message) {
       console.log("Send!");
       webSocket.current.send(JSON.stringify(new ChatMessageDto(user, message)));
+
+      setChatMessages([
+        ...chatMessages,
+        {
+          user: user,
+          message: message,
+        },
+      ]);
+
       setMessage("");
     }
   };
@@ -97,7 +106,7 @@ export default function Chat() {
         <Paper elevation={5}>
           <Box p={3}>
             <Typography variant="h4" gutterBottom>
-              Texting test
+              GuessCard test
             </Typography>
             <Divider />
             <Grid container spacing={4} alignItems="center">

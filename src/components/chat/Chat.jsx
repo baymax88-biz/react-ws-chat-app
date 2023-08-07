@@ -14,7 +14,6 @@ import {
 import { Box } from "@mui/system";
 import { Fragment, useEffect, useRef, useState } from "react";
 import axios from "axios";
-import { ChatMessageDto } from "../../model/ChatMessageDto";
 import "./Chat.css";
 import SendIcon from "@mui/icons-material/Send";
 
@@ -24,7 +23,6 @@ export default function Chat() {
   const scrollBottomRef = useRef(null);
   const webSocket = useRef(null);
   const [chatMessages, setChatMessages] = useState([]);
-  const [user, setUser] = useState("User");
   const [message, setMessage] = useState("");
 
   useEffect(() => {
@@ -58,13 +56,13 @@ export default function Chat() {
 
   useEffect(() => {
     webSocket.current.onmessage = (event) => {
-      const chatMessageDto = event.data;
-      console.log("Message:", chatMessageDto);
+      const chatMessage = event.data;
+      console.log("Message:", chatMessage);
       setChatMessages([
         ...chatMessages,
         {
           user: "Hayley_v2",
-          message: chatMessageDto,
+          message: chatMessage,
         },
       ]);
       if (scrollBottomRef.current) {
@@ -72,10 +70,6 @@ export default function Chat() {
       }
     };
   }, [chatMessages]);
-
-  const handleUserChange = (event) => {
-    setUser(event.target.value);
-  };
 
   const handleMessageChange = (event) => {
     setMessage(event.target.value);
@@ -88,14 +82,14 @@ export default function Chat() {
   };
 
   const sendMessage = () => {
-    if (user && message) {
+    if (message) {
       console.log("Send!");
-      webSocket.current.send(JSON.stringify(new ChatMessageDto(user, message)));
+      webSocket.current.send(message.toString());
 
       setChatMessages([
         ...chatMessages,
         {
-          user: user,
+          user: "User",
           message: message,
         },
       ]);
@@ -104,11 +98,9 @@ export default function Chat() {
     }
   };
 
-  const listChatMessages = chatMessages.map((chatMessageDto, index) => (
+  const listChatMessages = chatMessages.map((chatMessage, index) => (
     <ListItem key={index}>
-      <ListItemText
-        primary={`${chatMessageDto.user}: ${chatMessageDto.message}`}
-      />
+      <ListItemText primary={`${chatMessage.user}: ${chatMessage.message}`} />
     </ListItem>
   ));
 
@@ -128,17 +120,7 @@ export default function Chat() {
                   <ListItem ref={scrollBottomRef}></ListItem>
                 </List>
               </Grid>
-              <Grid xs={2} item>
-                <FormControl fullWidth>
-                  <TextField
-                    onChange={handleUserChange}
-                    value={user}
-                    label="Nickname"
-                    variant="outlined"
-                  />
-                </FormControl>
-              </Grid>
-              <Grid xs={9} item>
+              <Grid xs={11} item>
                 <FormControl fullWidth>
                   <TextField
                     onChange={handleMessageChange}

@@ -13,6 +13,7 @@ import {
 } from "@mui/material";
 import { Box } from "@mui/system";
 import { Fragment, useEffect, useRef, useState } from "react";
+import axios from "axios";
 import { ChatMessageDto } from "../../model/ChatMessageDto";
 import "./Chat.css";
 import SendIcon from "@mui/icons-material/Send";
@@ -23,21 +24,32 @@ export default function Chat() {
   const scrollBottomRef = useRef(null);
   const webSocket = useRef(null);
   const [chatMessages, setChatMessages] = useState([]);
-  const [user, setUser] = useState("");
+  const [user, setUser] = useState("User");
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    console.log("Opening WebSocket");
-    webSocket.current = new WebSocket("wss://ws-qa.hyly.us:9001");
-    const openWebSocket = () => {
-      webSocket.current.onopen = (event) => {
-        console.log("Open:", event);
+    const initTrigger = () => {
+      axios.post("https://ws-qa.hyly.us:5000/", {
+        message: "Can someone call me?",
+      });
+
+      console.log("Opening WebSocket");
+      webSocket.current = new WebSocket("wss://ws-qa.hyly.us:9001");
+
+      const openWebSocket = () => {
+        webSocket.current.onopen = (event) => {
+          console.log("Open:", event);
+        };
+        webSocket.current.onclose = (event) => {
+          console.log("Close:", event);
+        };
       };
-      webSocket.current.onclose = (event) => {
-        console.log("Close:", event);
-      };
+
+      openWebSocket();
     };
-    openWebSocket();
+
+    initTrigger();
+
     return () => {
       console.log("Closing WebSocket");
       webSocket.current.close();

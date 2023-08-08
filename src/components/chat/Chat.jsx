@@ -27,9 +27,14 @@ export default function Chat() {
 
   useEffect(() => {
     const initTrigger = () => {
-      axios.post("https://ws-qa.hyly.us:5000/", {
-        message: "Can someone call me?",
-      });
+      axios
+        .post("https://ws-qa.hyly.us:5000/", {
+          message:
+            "I want to move in by September 1st into a 1 BR apartment. What options do you have?",
+        })
+        .then((res) => {
+          updateLastMessage(res.data.response);
+        });
 
       console.log("Opening WebSocket");
       webSocket.current = new WebSocket("wss://ws-qa.hyly.us:9001");
@@ -70,6 +75,16 @@ export default function Chat() {
       }
     };
   }, [chatMessages]);
+
+  const updateLastMessage = (message) => {
+    setChatMessages((prev) => [
+      ...prev,
+      {
+        user: "Hayley_v2",
+        message,
+      },
+    ]);
+  };
 
   const handleMessageChange = (event) => {
     setMessage(event.target.value);

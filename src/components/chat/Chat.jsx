@@ -12,7 +12,7 @@ import {
   Typography,
 } from "@mui/material";
 import { Box } from "@mui/system";
-import { Fragment, useEffect, useRef, useState } from "react";
+import { Fragment, useRef, useState } from "react";
 import axios from "axios";
 import "./Chat.css";
 import SendIcon from "@mui/icons-material/Send";
@@ -21,59 +21,19 @@ export default function Chat() {
   const ENTER_KEY_CODE = 13;
 
   const scrollBottomRef = useRef(null);
-  const webSocket = useRef(null);
   const [chatMessages, setChatMessages] = useState([]);
   const [message, setMessage] = useState("");
 
-  useEffect(() => {
-    const initTrigger = () => {
-      axios
-        .post("https://ws-qa.hyly.us:5000/", {
-          message: "How long does an application take to approve?",
-        })
-        .then((res) => {
-          updateLastMessage(res.data.response);
-        });
-
-      console.log("Opening WebSocket");
-      webSocket.current = new WebSocket("wss://ws-qa.hyly.us:9001");
-
-      const openWebSocket = () => {
-        webSocket.current.onopen = (event) => {
-          console.log("Open:", event);
-        };
-        webSocket.current.onclose = (event) => {
-          console.log("Close:", event);
-        };
-      };
-
-      openWebSocket();
-    };
-
-    initTrigger();
-
-    return () => {
-      console.log("Closing WebSocket");
-      webSocket.current.close();
-    };
-  }, []);
-
-  useEffect(() => {
-    webSocket.current.onmessage = (event) => {
-      const chatMessage = event.data;
-      console.log("Message:", chatMessage);
-      setChatMessages([
-        ...chatMessages,
-        {
-          user: "Hayley_v2",
-          message: chatMessage,
-        },
-      ]);
-      if (scrollBottomRef.current) {
-        scrollBottomRef.current.scrollIntoView({ behavior: "smooth" });
-      }
-    };
-  }, [chatMessages]);
+  const sendFAQs = (message) => {
+    axios
+      .post("https://ws-qa.hyly.us:5000/", {
+        message,
+        propertyId: "1515103520797991461",
+      })
+      .then((res) => {
+        updateLastMessage(res.data.response);
+      });
+  };
 
   const updateLastMessage = (message) => {
     setChatMessages((prev) => [
@@ -98,7 +58,7 @@ export default function Chat() {
   const sendMessage = () => {
     if (message) {
       console.log("Send!");
-      webSocket.current.send(message.toString());
+      sendFAQs(message);
 
       setChatMessages([
         ...chatMessages,

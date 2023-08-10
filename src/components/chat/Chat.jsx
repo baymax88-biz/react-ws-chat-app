@@ -29,8 +29,7 @@ export default function Chat() {
     const initTrigger = () => {
       axios
         .post("https://ws-qa.hyly.us:5000/", {
-          message:
-            "I want to move in by September 1st into a 1 BR apartment. What options do you have?",
+          message: "How long does an application take to approve?",
         })
         .then((res) => {
           updateLastMessage(res.data.response);
